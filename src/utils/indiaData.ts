@@ -1,0 +1,116 @@
+export const ALL_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", 
+  "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", 
+  "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
+  "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
+  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", 
+  "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
+  "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
+
+export const MAJOR_CITIES_BY_STATE: Record<string, string[]> = {
+  "Gujarat": [
+    "Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", 
+    "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", 
+    "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", 
+    "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", 
+    "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", 
+    "Tapi", "Vadodara", "Valsad"
+  ],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Thane", "Aurangabad", "Solapur", "Amravati", "Navi Mumbai", "Kolhapur", "Akola", "Jalgaon", "Latur", "Dhule", "Ahmednagar", "Chandrapur", "Parbhani", "Jalna", "Bhusawal", "Navghar-Manikpur", "Panvel", "Satara", "Beed", "Yavatmal", "Kamptee", "Gondia", "Barshi", "Achalpur", "Osmanabad", "Nandurbar", "Wardha", "Udgir", "Hinganghat"],
+  "Rajasthan": ["Jaipur", "Jodhpur", "Kota", "Bikaner", "Ajmer", "Udaipur", "Bhilwara", "Alwar", "Bharatpur", "Sikar", "Pali", "Sri Ganganagar", "Kishangarh", "Baran", "Dhaulpur", "Tonk", "Beawar", "Hanumangarh"],
+  "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Varanasi", "Meerut", "Prayagraj", "Bareilly", "Aligarh", "Moradabad", "Saharanpur", "Gorakhpur", "Noida", "Firozabad", "Jhansi", "Muzaffarnagar", "Mathura", "Rampur", "Shahjahanpur", "Ayodhya"],
+  "Madhya Pradesh": ["Indore", "Bhopal", "Jabalpur", "Gwalior", "Ujjain", "Sagar", "Dewas", "Satna", "Ratlam", "Rewa", "Murwara", "Singrauli", "Burhanpur", "Khandwa", "Bhind", "Chhindwara", "Guna", "Shivpuri", "Vidisha", "Chhatarpur"],
+  "Delhi": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi", "Central Delhi", "Shahdara", "Rohini", "Dwarka", "Vasant Kunj", "Hauz Khas", "Karol Bagh", "Pitampura", "Janakpuri", "Lajpat Nagar"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Hubballi-Dharwad", "Mangaluru", "Belagavi", "Davangere", "Ballari", "Vijayapura", "Kalaburagi", "Shivamogga", "Tumakuru", "Raichur", "Bidar", "Hosapete", "Gadag-Betageri"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Ranipet", "Vellore", "Thoothukkudi", "Dindigul", "Thanjavur", "Kumbakonam", "Rajapalayam", "Pudukkottai"],
+  "West Bengal": ["Kolkata", "Asansol", "Siliguri", "Durgapur", "Bardhaman", "Malda", "Baharampur", "Habra", "Kharagpur", "Shantipur", "Dankuni", "Dhulian", "Ranaghat", "Haldia", "Raiganj", "Krishnanagar"],
+  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Bihar Sharif", "Arrah", "Begusarai", "Katihar", "Munger", "Chhapra", "Danapur", "Saharsa", "Hajipur", "Sasaram"],
+};
+
+export const AREAS_BY_CITY: Record<string, string[]> = {
+  // Gujarat
+  "Surat": ["Katargam", "Varachha", "Adajan", "Vesu", "Piplod", "Palanpur", "Udhna", "Sachin", "Amroli", "Bhatar", "Nanpura", "Athwalines", "Rander", "Pandesara", "Dindoli", "Godadara", "Kumbharia", "Puna", "Sarthana", "Chowk Bazar", "City Light", "Althan", "Bhestan", "Jahangirpura", "Ved Road", "Singanpor", "Limbayat", "Bambhroli", "Khatodra", "Udhna Magdalla Road", "Bhesan", "Kamrej", "Mahuva", "Bardoli", "Olpad", "Palsana", "Mangrol", "Mandvi", "Umarpada", "Choryasi", "Hazira", "Sayan", "Kathor", "Kholvad"],
+  "Ahmedabad": ["Bopal", "Satellite", "Vastrapur", "Navrangpura", "Thaltej", "Gota", "Maninagar", "Naroda", "Bapunagar", "Paldi", "Ellisbridge", "Naranpura", "Chandkheda", "Motera", "SG Highway", "Ashram Road", "Ghatlodia", "Vejalpur", "C G Road", "Makarba", "Jodhpur", "Prahlad Nagar", "Bodakdev", "Sola", "Science City", "Nikol", "Odhav", "Vatva", "Isanpur", "Dani Limda", "Gita Mandir", "Shahibaug", "Daskroi", "Sanand", "Bavla", "Dholka", "Viramgam", "Mandal", "Detroj"],
+  "Vadodara": ["Alkapuri", "Akota", "Sayajigunj", "Gotri", "Vasna", "Manjalpur", "Makarpura", "Karelibaug", "Sama", "Nizampura", "Fatehgunj", "Waghodia", "Ajwa", "Chhani", "Gorwa", "Subhanpura", "Tarsali", "Dabhoi", "Karjan", "Padra", "Savli", "Vaghodia", "Desar", "Shinore"],
+  "Rajkot": ["Kalawad Road", "University Road", "Amin Marg", "Nana Mava", "Mota Mava", "Raiya", "Gondal Road", "Dhebar Road", "Kothariya", "Mavdi", "Sadhu Vasvani Road", "Yagnik Road", "Race Course", "Bhaktinagar", "Aji GIDC", "Metoda", "Shapar", "Gondal", "Jasdan", "Jetpur", "Dhoraji", "Upleta", "Jam Kandorna", "Padadhari", "Vinchhiya", "Lodhika"],
+  "Bhavnagar": ["Kalanala", "Waghawadi Road", "Crescent", "Ghogha Circle", "Jewel Circle", "Vidhyanagar", "Talaja", "Mahuva", "Gariadhar", "Palitana", "Sihor", "Umrala", "Vallabhipur", "Ghogha", "Jesar", "Kumbharwada", "Nari", "Chitra"],
+  "Jamnagar": ["Summair Club Road", "Patel Colony", "Saru Section Road", "Khodiyar Colony", "Ranjit Nagar", "Digvijay Plot", "Lalpur", "Kalavad", "Jodiya", "Dhrol", "Jamjodhpur", "Bhanvad", "Kalyanpur", "Khambhaliya"],
+  "Gandhinagar": ["InfoCity", "Sector 11", "Sector 21", "Sargasan", "Kudasan", "Raysan", "Randesan", "PDPU Road", "GIFT City", "Dehgam", "Mansa", "Kalol", "Adalaj", "Pethapur", "Randheja"],
+  "Amreli": ["Amreli City", "Babra", "Lathi", "Lilia", "Kunkavav", "Dhari", "Khambha", "Rajula", "Jafrabad", "Savarkundla", "Chalala", "Bagasara", "Vadia"],
+  "Anand": ["Vidyanagar", "Karamsad", "Bakrol", "Umreth", "Petlad", "Sojitra", "Borsad", "Anklav", "Tarapur", "Khambhat", "Mogar", "Chikhodra"],
+  "Kutch": ["Bhuj", "Anjar", "Gandhidham", "Mundra", "Mandvi", "Abdasa", "Lakhpat", "Nakhatrana", "Rapar", "Bhachau", "Madhapar", "Gadhshisa", "Khavda", "Dayapar"],
+  "Navsari": ["Navsari City", "Jalalpore", "Gandevi", "Chikhli", "Vansda", "Khergam", "Bilimora", "Vesma", "Mahuvar", "Supedi", "Abrama", "Eru", "Vijalpor", "Mendhar", "Dandi", "Sisodra", "Amadpore"],
+  "Valsad": ["Valsad City", "Pardi", "Vapi", "Umbergaon", "Dharampur", "Kaprada", "Atul", "Dungri", "Abrama", "Kosamba", "Bhimpore", "Tithal", "Sarigam", "Bhilad", "Sanjan", "Khatalwada"],
+  "Bharuch": ["Bharuch City", "Ankleshwar", "Jambusar", "Amod", "Vagra", "Hansot", "Valia", "Jhagadia", "Netrang", "GIDC", "Bholav", "Maktampur", "Zadeshwar", "Dahej", "Palej", "Panoli", "Nabipur"],
+  "Panchmahal": ["Godhra", "Halol", "Kalol", "Ghoghamba", "Jambughoda", "Shehera", "Morva Hadaf"],
+  "Mehsana": ["Mehsana City", "Visnagar", "Unjha", "Kheralu", "Vadnagar", "Vijapur", "Becharaji", "Kadi", "Jotana", "Gozaria", "Satlasana"],
+  "Junagadh": ["Zanzarda Road", "Moti Baug", "Joshipura", "Keshod", "Mangrol", "Manavadar", "Malia", "Talala", "Veraval", "Visavadar", "Mendarda", "Bhesan"],
+
+  // Maharashtra
+  "Mumbai": ["Andheri", "Bandra", "Borivali", "Colaba", "Dadar", "Goregaon", "Juhu", "Kandivali", "Malad", "Mulund", "Powai", "Santacruz", "Vile Parle", "Worli", "Kurla", "Chembur", "Ghatkopar", "Dharavi", "Mahim"],
+  "Pune": ["Kothrud", "Viman Nagar", "Hinjewadi", "Kalyani Nagar", "Hadapsar", "Kharadi", "Baner", "Wakad", "Aundh", "Camp", "Koregaon Park", "Shivajinagar", "Swargate"],
+  "Nagpur": ["Sitabuldi", "Dharampeth", "Mahal", "Itwari", "Sadar", "Ramdaspeth", "Ganeshpeth", "Nandanvan", "Wardhaman Nagar", "Manish Nagar"],
+
+  // Rajasthan
+  "Jaipur": ["Malviya Nagar", "Vaishali Nagar", "Mansarovar", "C-Scheme", "Raja Park", "Jagatpura", "Bapu Nagar", "Sodala", "Vidhyadhar Nagar", "Pratap Nagar", "Amer"],
+  "Jodhpur": ["Sardarpura", "Shastri Nagar", "Ratanada", "Chopasni Housing Board", "Basni", "Maha Mandir", "Pratap Nagar", "Mandore"],
+  
+  // Delhi
+  "North Delhi": ["Civil Lines", "Kotwali", "Sadar Bazar", "Sabzi Mandi", "Bara Hindu Rao", "Roop Nagar", "Kamla Nagar"],
+  "South Delhi": ["Saket", "Hauz Khas", "Malviya Nagar", "Vasant Kunj", "Greater Kailash", "South Extension", "Green Park", "Defense Colony"],
+  "East Delhi": ["Preet Vihar", "Laxmi Nagar", "Mayur Vihar", "Patparganj", "Gandhi Nagar", "Shahdara"],
+  "West Delhi": ["Punjabi Bagh", "Rajouri Garden", "Patel Nagar", "Janakpuri", "Dwarka", "Tilak Nagar", "Paschim Vihar"],
+
+  // Uttar Pradesh
+  "Lucknow": ["Gomti Nagar", "Aliganj", "Indira Nagar", "Hazratganj", "Aminabad", "Chowk", "Mahanagar", "Vikash Nagar"],
+  "Kanpur": ["Kakadeo", "Kidwai Nagar", "Civil Lines", "Swaroop Nagar", "Panki", "Govind Nagar", "Kalyanpur", "Chakeri"]
+};
+
+export const LANDMARKS_BY_AREA: Record<string, string[]> = {
+  "Katargam": ["Dabholi Char Rasta", "Manish Nagar", "Amba Talavadi", "Gajera Circle", "Darpan Cinema", "Hari Om Mill", "Gotalawadi", "Lal Darwaja", "Kiran Hospital", "Kuber Nagar", "Jhanda Chowk", "Bapu Nagar", "Paras Society", "Gopi Talav", "Kantheshwar Mahadev", "Aashram Road", "Swaminarayan Mandir", "Vastadevdi Road", "Fulpada", "Ved Darwaja", "Kosad Awas", "Gajera School"],
+  "Varachha": ["Hirabaug Circle", "Mini Bazar", "Baroda Pristage", "Yogi Chowk", "Kapodra Police Station", "Matawadi", "Puna Patiya", "Chowpati", "Sitanagar", "Archana School", "Rachna Circle", "Ghanshyam Nagar", "Lalita Chokdi", "Sardar Smruti Bhavan", "L H Road", "A K Road", "Bhatni Wadi", "Podar School"],
+  "Adajan": ["Gujarat Gas Circle", "LP Savani Road", "Honey Park Road", "BAPS Swaminarayan Temple", "Pal RTO", "Gaurav Path", "Star Bazaar", "Prime Shopper", "Green Avenue", "Adajan Patia", "Sanjeev Kumar Auditorium", "Mahalaxmi Temple", "Anand Mahal Road", "Bhulka Bhavan School"],
+  "Vesu": ["Kargil Chowk", "SD Jain School", "VIP Road", "Agam Arcade", "Bhagwan Mahavir College", "Nandini", "Someshwara Enclave", "Reliance Market", "Capital Square", "JH Ambani School", "Rundh Nath Temple"],
+  "Udhna": ["Udhna Darwaja", "Silicon Shopper", "Udhna Railway Station", "Pandesara GIDC", "Satyanagar", "BRC", "Daxeshwar Mahadev", "Bhatena", "Piyush Point", "Navsari Bazar", "Kharwarnagar", "Bhestan Railway Station"],
+  "Piplod": ["Lake View Garden", "Rahul Raj Mall", "VR Mall", "Dumas Road", "Iscon Mall", "SVNIT", "Panjrapol", "Kargil Chowk Piplod", "Sargam Doctor House"],
+  "Alkapuri": ["National Plaza", "Welcome Hotel", "Concorde", "Genda Circle", "RC Dutt Road", "Arunoday Society", "Inorbit Mall", "Bird Circle"],
+  "Bopal": ["TRP Mall", "Bopal Lake", "Vakil Saheb Bridge", "Sobha Center", "Delhi Public School", "Suncity", "Ambali Road"],
+  "Kamrej": ["Kamrej Char Rasta", "Kolavada", "Navagam", "Dhoran Pardi", "Vav", "Kholvad", "Abrama", "Laskana"],
+  "Bardoli": ["Sardar Vallabhbhai Patel Ashram", "Mota", "Baben", "Ten", "Kedarshwar Mahadev", "Astigam"],
+  "Navsari City": ["Lunsikui", "Tower", "Vijalpor", "Italva", "Kabilpore", "Grid", "Dudhia Talav", "Asha Nagar", "Tigra"],
+  "Valsad City": ["Tithal Beach", "Dharampur Chokdi", "Abrama", "Halar", "Mota Bazar", "Nanakwada", "Koser"],
+  "Vapi": ["Gunjan Char Rasta", "Chala", "Koparli Road", "Vapi GIDC", "Silvassa Road", "Imran Nagar", "Muktanand Marg"],
+  "Ankleshwar": ["GIDC", "ONGC", "Valia Road", "Piraman", "Bhadkodra", "Chauta Bazar"],
+  "Bharuch City": ["Shaktinath", "Bholav", "Kasak", "Railway Station Road", "Zadeshwar Chokdi", "C R Patil Road", "Maktampur"],
+  "Bodakdev": ["Judges Bunglow Road", "Sindhu Bhavan Road", "Pakwan Cross Road", "Rajpath Club"],
+  "SG Highway": ["Karnavati Club", "Zydus Hospital", "ISKCON Cross Road", "YMCA Club", "Gujarat High Court"],
+  "Maninagar": ["Kankaria Lake", "Jawahar Chowk", "Rambaug Complex", "Bhairavnath Road", "Cadila Bridge"],
+  "Andheri": ["Andheri Station", "Lokhandwala Complex", "Versova Beach", "MIDC", "SEEPZ", "Sahar Road"],
+  "Bandra": ["Mount Mary Church", "Linking Road", "Carter Road", "Bandra Kurla Complex (BKC)", "Bandstand"],
+  "Kothrud": ["Karve Statue", "Chandni Chowk", "Kothrud Depot", "MIT College", "Bhusari Colony"],
+  "Gomti Nagar": ["Patrakarpuram", "Ambedkar Park", "Wave Mall", "Sahara Hospital", "Manoj Pandey Chauraha"]
+};
+
+export const COMMON_LANDMARKS: string[] = [
+  "Near Swaminarayan Temple",
+  "Near Railway Station",
+  "Near Bus Stand",
+  "Near Post Office",
+  "Near Civil Hospital",
+  "Near Gram Panchayat",
+  "Near School",
+  "Near Main Market",
+  "Opposite Bank",
+  "Main Bazar",
+  "Highway Touch",
+  "Near Mahadev Temple",
+  "Near Jain Derasar",
+  "Near Masjid",
+  "Near Hanuman Temple",
+  "Near Lake",
+  "Society Main Gate",
+  "Cross Road (Chokdi)",
+  "Near Police Station",
+  "Opposite Petrol Pump"
+];

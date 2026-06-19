@@ -1,0 +1,6 @@
+{
+  "name": "Radhika Ma Service - Admin Portal",
+  "description": "Internal staff software for managing business funding, investors, and commissions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
