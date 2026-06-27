@@ -1,6 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { initializeFirestore } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { initializeApp } from"firebase/app";
+import { initializeFirestore } from"firebase/firestore";
+import firebaseConfig from"../../firebase-applet-config.json";
 
 const app = initializeApp({
   projectId: firebaseConfig.projectId,
@@ -11,6 +11,10 @@ const app = initializeApp({
   messagingSenderId: firebaseConfig.messagingSenderId,
 });
 
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true
-}, firebaseConfig.firestoreDatabaseId);
+export const db = initializeFirestore(
+  app,
+  {
+    experimentalForceLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId,
+);

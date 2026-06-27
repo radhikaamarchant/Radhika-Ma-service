@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from"react";
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme ="light" |"dark" |"system";
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,34 +12,35 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme');
-    return (saved as Theme) || 'system';
+    const saved = localStorage.getItem("theme");
+    return (saved as Theme) ||"system";
   });
 
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
+
     function updateTheme() {
-      if (theme === 'system') {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        root.classList.toggle('dark', systemDark);
+      if (theme ==="system") {
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)",
+        ).matches;
+        root.classList.toggle("dark", systemDark);
         setIsDark(systemDark);
       } else {
-        root.classList.toggle('dark', theme === 'dark');
-        setIsDark(theme === 'dark');
+        root.classList.toggle("dark", theme ==="dark");
+        setIsDark(theme ==="dark");
       }
     }
 
     updateTheme();
-    localStorage.setItem('theme', theme);
+    localStorage.setItem("theme", theme);
 
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (theme ==="system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
       const listener = () => updateTheme();
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
+      mediaQuery.addEventListener("change", listener);
+      return () => mediaQuery.removeEventListener("change", listener);
     }
   }, [theme]);
 
@@ -53,7 +54,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 }

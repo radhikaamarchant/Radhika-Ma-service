@@ -1,10 +1,21 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowLeft, Save, Upload, Image as ImageIcon, BadgeCheck, X, Building2 } from 'lucide-react';
-import Cropper from 'react-easy-crop';
-import { useAppContext } from '../utils/AppContext';
-import { getUnifiedBankBalance, getUnifiedTransactions } from '../utils/bankBalance';
-import { sanitizeDatabase } from '../utils/dataSanitizer';
-import { formatINR } from '../utils/mockData';
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import {
+  ArrowLeft,
+  Upload,
+  BadgeCheck,
+  X,
+  Building2,
+  Bell,
+  User,
+  Info
+} from "lucide-react";
+import Cropper from "react-easy-crop";
+import { useAppContext } from "../utils/AppContext";
+import {
+  getUnifiedBankBalance,
+  getUnifiedTransactions,
+} from "../utils/bankBalance";
+import { formatINR } from "../utils/mockData";
 
 interface AdminProfile {
   name: string;
@@ -16,15 +27,18 @@ interface AdminProfile {
   branch?: string;
 }
 
+type AdminView = "menu" | "funds" | "profile" | "bank" | "statement";
+
 export default function AdminPage() {
   const { state, dispatch } = useAppContext();
-  
   const [profile, setProfile] = useState<AdminProfile>(() => {
-    const saved = localStorage.getItem('adminProfile');
-    return saved ? JSON.parse(saved) : { name: 'Admin', address: '', photoUrl: '' };
+    const saved = localStorage.getItem("adminProfile");
+    return saved
+      ? JSON.parse(saved)
+      : { name: "Radhika Marchant", address: "", photoUrl: "" };
   });
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [currentView, setCurrentView] = useState<AdminView>("menu");
   const [formData, setFormData] = useState(profile);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -38,50 +52,48 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (state.loading) return;
-    const adminBizId = 'admin_business';
-    const adminInvId = 'admin_investor';
-    
-    if (state.businesses.find(b => b.id === adminBizId)) {
-      dispatch({ type: 'DELETE_BUSINESS', payload: adminBizId });
+    const adminBizId = "admin_business";
+    const adminInvId = "admin_investor";
+    if (state.businesses.find((b) => b.id === adminBizId)) {
+      dispatch({ type: "DELETE_BUSINESS", payload: adminBizId });
     }
-    if (state.investors.find(i => i.id === adminInvId)) {
-      dispatch({ type: 'DELETE_INVESTOR', payload: adminInvId });
+    if (state.investors.find((i) => i.id === adminInvId)) {
+      dispatch({ type: "DELETE_INVESTOR", payload: adminInvId });
     }
   }, [state.loading, state.businesses.length, state.investors.length]);
 
-
-
   const handleSave = async () => {
-    localStorage.setItem('adminProfile', JSON.stringify(formData));
+    localStorage.setItem("adminProfile", JSON.stringify(formData));
     setProfile(formData);
-    setIsEditing(false);
-    window.dispatchEvent(new Event('adminProfileUpdated'));
+    setCurrentView("menu");
+    window.dispatchEvent(new Event("adminProfileUpdated"));
   };
 
-  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  const onCropComplete = useCallback(
+    (croppedArea: any, croppedAreaPixels: any) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    [],
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
-      reader.addEventListener('load', () => setImageSrc(reader.result?.toString() || null));
+      reader.addEventListener("load", () =>
+        setImageSrc(reader.result?.toString() || null),
+      );
       reader.readAsDataURL(e.target.files[0]);
     }
   };
 
   const createCroppedImage = async () => {
     if (!imageSrc || !croppedAreaPixels) return;
-
     const image = new Image();
     image.src = imageSrc;
     await new Promise((resolve) => (image.onload = resolve));
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
     // Scale down if too large
     // @ts-ignore
     const maxSize = 400;
@@ -89,16 +101,13 @@ export default function AdminPage() {
     let targetWidth = croppedAreaPixels.width;
     // @ts-ignore
     let targetHeight = croppedAreaPixels.height;
-    
     if (targetWidth > maxSize || targetHeight > maxSize) {
       const ratio = Math.min(maxSize / targetWidth, maxSize / targetHeight);
       targetWidth *= ratio;
       targetHeight *= ratio;
     }
-
     canvas.width = targetWidth;
     canvas.height = targetHeight;
-
     ctx.drawImage(
       image,
       // @ts-ignore
@@ -112,302 +121,375 @@ export default function AdminPage() {
       0,
       0,
       targetWidth,
-      targetHeight
+      targetHeight,
     );
-
-    const base64Image = canvas.toDataURL('image/jpeg', 0.7);
-    setFormData({ ...formData, photoUrl: base64Image });
+    const base64Image = canvas.toDataURL("image/jpeg", 0.7);
+    
+    // Save photo immediately
+    const updatedProfile = { ...formData, photoUrl: base64Image };
+    setFormData(updatedProfile);
+    localStorage.setItem("adminProfile", JSON.stringify(updatedProfile));
+    setProfile(updatedProfile);
+    window.dispatchEvent(new Event("adminProfileUpdated"));
+    
     setImageSrc(null);
   };
 
-  const unifiedBalance = getUnifiedBankBalance('Radhika M', state.businesses, state.investors, state.investments, state.settings);
-  const bankTransactions = getUnifiedTransactions('Radhika M', state.businesses, state.investors, state.investments, state.settings);
+  const unifiedBalance = getUnifiedBankBalance(
+    profile.name,
+    state.businesses,
+    state.investors,
+    state.investments,
+    state.settings,
+  );
+
+  const bankTransactions = getUnifiedTransactions(
+    profile.name,
+    state.businesses,
+    state.investors,
+    state.investments,
+    state.settings,
+  );
+
+  const calculateFees = () => {
+    let regOwnerFees = 0;
+    state.businesses.forEach(b => {
+      if (b.id !== "admin_business") {
+        regOwnerFees += (b.registrationCommissionPaid || 0) + (b.taxPaid || 0);
+      }
+    });
+
+    let investorFees = 0;
+    state.investors.forEach(i => {
+      if (i.id !== "admin_investor") {
+        investorFees += (i.rmasServiceCharge || 0);
+      }
+    });
+
+    let authorities = 0;
+    let investmentsCommission = 0;
+    let brokerage = 0;
+    let hpgTax = 0;
+
+    state.investments.forEach(inv => {
+      investmentsCommission += (inv.adminCommissionBusiness || 0) + (inv.adminCommissionInvestor || 0);
+      if (inv.status === "completed" && inv.payoutDetails) {
+        authorities += (inv.payoutDetails.rmasSubsidyPays || 0);
+        brokerage += (inv.payoutDetails.rmasCommission || 0);
+        hpgTax += (inv.payoutDetails.happyIncomeTax || 0);
+      }
+    });
+
+    return {
+      regOwnerFees,
+      investorFees,
+      authorities,
+      investmentsCommission,
+      brokerage,
+      hpgTax
+    };
+  };
+
+  const fees = calculateFees();
 
   return (
-    <div className="flex-1 bg-[#f4f4f4] md:bg-kite-bg h-full p-0 md:p-8 overflow-y-auto animate-fade-in relative font-sans">
-      <div className="max-w-3xl mx-auto space-y-2 md:space-y-6">
-        <div className="hidden md:flex justify-between items-end mb-8 border-b border-kite-border pb-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-kite-text">I'm Radhika</h2>
-            <p className="text-sm text-kite-text-light mt-1">Admin Profile Settings</p>
-          </div>
-          <div className="flex space-x-3">
-            {!isEditing && (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-kite-blue text-white px-5 py-2 rounded-sm text-sm font-medium hover:bg-kite-blue/90 transition-colors shadow-sm"
-                >
-                  Edit Profile
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white md:rounded-sm border-b md:border border-gray-200 md:border-kite-border px-4 py-6 md:p-6 md:shadow-sm">
-          {/* Mobile Edit Button */}
-  {!isEditing && (
-    <div className="md:hidden flex justify-end w-full -mb-8 relative z-10">
-      <button onClick={() => setIsEditing(true)} className="text-blue-500 text-sm font-medium">Edit</button>
-    </div>
-  )}
-  <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
-            {/* Photo Section */}
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border border-gray-200 bg-gray-50 flex flex-col items-center justify-center relative group shadow-sm">
-                {formData.photoUrl ? (
-                  <img src={formData.photoUrl} alt="Admin" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-gray-400 flex flex-col items-center">
-                    <ImageIcon className="w-8 h-8 mb-2 opacity-50" />
-                    <span className="text-[10px] font-medium uppercase tracking-wider">No Photo</span>
-                  </div>
-                )}
-                
-                {isEditing && (
-                  <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer"
-                  >
-                    <Upload className="w-6 h-6 mb-1" />
-                    <span className="text-xs font-medium">Upload</span>
-                  </button>
-                )}
+    <div className="bg-[#F8F9FA] md:bg-[#F8F9FA] min-h-full flex flex-col font-sans">
+      <div className="w-full max-w-xl mx-auto flex-1 bg-[#F8F9FA] md:border-x md:border-gray-200">
+        
+        {currentView === "menu" && (
+          <div className="animate-fade-in pb-10">
+            <div className="px-5 pt-6 pb-2">
+              <div className="flex justify-between items-start mb-6">
+                <h1 className="text-[22px] md:text-[24px] font-medium text-[#444444]">
+                  Account
+                </h1>
+                <Bell className="w-5 h-5 text-gray-500" />
               </div>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
-                accept="image/*"
-              />
+              <p className="text-[15px] md:text-[16px] text-[#444444] mb-2 tracking-wide flex items-center gap-1.5">
+                {profile.name} <BadgeCheck className="w-[18px] h-[18px] text-[#1976D2]" />
+              </p>
+            </div>
+            
+            <div className="px-5 pb-6">
+               <div className="bg-white rounded border border-gray-200 p-5 relative shadow-sm">
+                  <div className="flex justify-between items-center">
+                     <div>
+                       <h2 className="text-[14px] md:text-[15px] font-normal text-[#444444] tracking-wider uppercase">RMAS OFFICIAL</h2>
+                       <p className="text-[12px] md:text-[13px] text-[#9EA1A6] mt-1 tracking-wide">radhikaamarchant@gmail.com</p>
+                     </div>
+                     <div className="relative cursor-pointer shrink-0 ml-4" onClick={() => fileInputRef.current?.click()}>
+                       <div className="w-[68px] h-[68px] md:w-[76px] md:h-[76px] rounded-full bg-[#E8F0FE] text-[#1976D2] flex items-center justify-center overflow-hidden relative">
+                         {profile.photoUrl ? (
+                           <img src={profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                         ) : (
+                           <span className="text-[24px] font-normal">{profile.name.substring(0, 2).toUpperCase()}</span>
+                         )}
+                         <div className="absolute bottom-0 w-full h-1/3 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                           <Upload className="w-3 h-3 text-white" />
+                         </div>
+                       </div>
+                     </div>
+                     <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+                  </div>
+               </div>
+            </div>
+            
+            <div className="bg-white border-t border-gray-100 pt-2 pb-8">
+               <div className="px-5 py-4 border-b border-gray-100">
+                 <h3 className="text-[14px] md:text-[15px] font-medium text-[#444444]">Account</h3>
+               </div>
+               <div className="flex flex-col">
+                 <button onClick={() => setCurrentView("funds")} className="flex items-center justify-between px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group w-full text-left">
+                    <span className="text-[14px] md:text-[15px] font-normal text-[#444444]">Funds</span>
+                    <span className="text-[16px] md:text-[18px] text-gray-400 font-serif mr-1">₹</span>
+                 </button>
+                 <button onClick={() => setCurrentView("profile")} className="flex items-center justify-between px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group w-full text-left">
+                    <span className="text-[14px] md:text-[15px] font-normal text-[#444444]">Profile</span>
+                    <User className="w-4 h-4 text-gray-400 mr-1" />
+                 </button>
+                 <button onClick={() => setCurrentView("bank")} className="flex items-center justify-between px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group w-full text-left">
+                    <span className="text-[14px] md:text-[15px] font-normal text-[#444444]">Bank details</span>
+                    <Building2 className="w-4 h-4 text-gray-400 mr-1" />
+                 </button>
+               </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === "funds" && (
+          <div className="bg-[#F8F9FA] min-h-full flex flex-col animate-fade-in relative -mx-0">
+            <div className="bg-white flex items-center px-4 py-4 md:py-5 border-b border-gray-100 sticky top-0 z-10">
+              <button onClick={() => setCurrentView("menu")} className="mr-4 text-[#444444] p-1">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-[18px] md:text-[20px] font-medium text-[#444444]">Funds</h1>
             </div>
 
-            {/* Details Section */}
-            <div className="flex-1 space-y-6 w-full">
-              {isEditing ? (
-                <>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Admin Name</label>
-                      <input
-                        type="text"
-                        className="w-full border-b-2 border-gray-200 p-2 text-lg font-medium focus:border-kite-blue outline-none transition-colors"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Admin Name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Office / Home Address</label>
-                      <textarea
-                        className="w-full border-b-2 border-gray-200 p-2 text-base focus:border-kite-blue outline-none transition-colors resize-none h-24"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="Enter full address..."
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="pt-5 md:pt-6 border-t border-gray-100">
-<h3 className="text-[13px] md:text-sm font-medium text-gray-800 tracking-tight mb-3 md:mb-4 flex items-center"><BadgeCheck className="w-4 h-4 mr-1 text-kite-blue" /> Bank Account Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Bank Name</label>
-                        <input
-                          type="text"
-                          className="w-full border-b-2 border-gray-200 p-2 text-base font-medium focus:border-kite-blue outline-none transition-colors"
-                          value={formData.bankName || ''}
-                          onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                          placeholder="e.g. HDFC Bank"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Account Number</label>
-                        <input
-                          type="text"
-                          className="w-full border-b-2 border-gray-200 p-2 text-base font-medium focus:border-kite-blue outline-none transition-colors"
-                          value={formData.accountNumber || ''}
-                          onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                          placeholder="e.g. 50100XXXXXXX"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">IFSC Code</label>
-                        <input
-                          type="text"
-                          className="w-full border-b-2 border-gray-200 p-2 text-base font-medium focus:border-kite-blue outline-none transition-colors uppercase"
-                          value={formData.ifscCode || ''}
-                          onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
-                          placeholder="e.g. HDFC0001234"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Branch</label>
-                        <input
-                          type="text"
-                          className="w-full border-b-2 border-gray-200 p-2 text-base font-medium focus:border-kite-blue outline-none transition-colors"
-                          value={formData.branch || ''}
-                          onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                          placeholder="e.g. Navrangpura"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-3 pt-6 border-t border-kite-border">
-                    <button
-                      onClick={handleSave}
-                      className="flex items-center space-x-2 bg-kite-blue hover:bg-kite-blue/90 text-white px-5 py-2.5 rounded-sm text-sm font-medium transition-colors shadow-sm"
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>Save Profile</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setFormData(profile);
-                        setIsEditing(false);
-                      }}
-                      className="flex items-center space-x-2 bg-white border border-kite-border hover:bg-gray-50 text-kite-text px-5 py-2.5 rounded-sm text-sm font-medium transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                      <span>Cancel</span>
-                    </button>
-                  </div>
-                </>
+            <div className="p-4 md:p-5 flex-1">
+              <div className="bg-white rounded shadow-sm border border-gray-200 p-5 mb-6 text-center">
+                <p className="text-[12px] md:text-[13px] text-[#9EA1A6] font-normal mb-2 flex items-center justify-center gap-1.5">
+                  Available margin (Cash + Collateral) <Info className="w-3.5 h-3.5 text-[#1976D2]" />
+                </p>
+                <p className="text-[28px] md:text-[32px] font-medium text-[#1976D2] tracking-wide mb-4">
+                  {unifiedBalance >= 0 ? "" : "-"}₹{formatINR(Math.abs(unifiedBalance)).replace("₹", "")}
+                </p>
+                <button 
+                  onClick={() => setCurrentView("statement")}
+                  className="flex items-center justify-center gap-1.5 text-[13px] md:text-[14px] text-[#1976D2] font-normal mx-auto"
+                >
+                  <span className="w-2.5 h-2.5 border-2 border-[#1976D2] rounded-full inline-block"></span>
+                  View statement
+                </button>
+              </div>
+
+              <div className="bg-white border-t border-gray-100 mt-2 pb-10">
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Opening balance</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">30,00,00,000.00</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Reg owner fees</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.regOwnerFees).replace("₹", "")}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Investor fees</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.investorFees).replace("₹", "")}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Authorities</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.authorities).replace("₹", "")}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Investments</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.investmentsCommission).replace("₹", "")}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">Brokerage</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.brokerage).replace("₹", "")}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 md:py-4 px-4 border-b border-gray-50">
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-normal">HPG Tax</span>
+                  <span className="text-[13px] md:text-[14px] text-[#444444] font-mono">{formatINR(fees.hpgTax).replace("₹", "")}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === "profile" && (
+          <div className="bg-white flex-1 min-h-screen animate-fade-in relative pb-10">
+            <div className="px-4 py-4 flex items-center border-b border-gray-100 sticky top-0 z-10 bg-white">
+              <button onClick={() => { setCurrentView("menu"); setFormData(profile); }} className="mr-4 text-[#444444] p-1">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-[18px] md:text-[20px] font-medium text-[#444444]">Profile Details</h1>
+            </div>
+            
+            <div className="p-5 md:p-6 space-y-6">
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-normal text-[#444444] focus:border-[#1976D2] outline-none transition-colors"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  Office / Home Address
+                </label>
+                <textarea
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-normal text-[#444444] focus:border-[#1976D2] outline-none transition-colors resize-none h-20"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                />
+              </div>
+              
+              <div className="pt-4">
+                <button onClick={handleSave} className="w-full bg-[#1976D2] text-white py-3 rounded font-normal text-[14px] md:text-[15px] hover:bg-blue-600 transition-colors">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === "bank" && (
+          <div className="bg-white flex-1 min-h-screen animate-fade-in relative pb-10">
+            <div className="px-4 py-4 flex items-center border-b border-gray-100 sticky top-0 z-10 bg-white">
+              <button onClick={() => { setCurrentView("menu"); setFormData(profile); }} className="mr-4 text-[#444444] p-1">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-[18px] md:text-[20px] font-medium text-[#444444]">Bank details</h1>
+            </div>
+            
+            <div className="p-5 md:p-6 space-y-6">
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  Bank Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-normal text-[#444444] focus:border-[#1976D2] outline-none transition-colors"
+                  value={formData.bankName || ""}
+                  onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  Account Number
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-mono text-[#444444] focus:border-[#1976D2] outline-none transition-colors"
+                  value={formData.accountNumber || ""}
+                  onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  IFSC Code
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-mono uppercase text-[#444444] focus:border-[#1976D2] outline-none transition-colors"
+                  value={formData.ifscCode || ""}
+                  onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] md:text-[13px] font-medium uppercase tracking-wider text-[#9EA1A6] mb-1">
+                  Branch
+                </label>
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-300 py-2 bg-transparent text-[14px] md:text-[15px] font-normal text-[#444444] focus:border-[#1976D2] outline-none transition-colors"
+                  value={formData.branch || ""}
+                  onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                />
+              </div>
+              
+              <div className="pt-4">
+                <button onClick={handleSave} className="w-full bg-[#1976D2] text-white py-3 rounded font-normal text-[14px] md:text-[15px] hover:bg-blue-600 transition-colors">
+                  Save Bank Details
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentView === "statement" && (
+          <div className="bg-white flex-1 animate-fade-in relative pb-10 min-h-screen">
+            <div className="px-4 py-4 flex items-center border-b border-gray-100 sticky top-0 z-10 bg-white">
+              <button onClick={() => setCurrentView("funds")} className="mr-4 text-[#444444] p-1">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-[18px] md:text-[20px] font-medium text-[#444444]">Financial Statement</h1>
+            </div>
+
+            <div className="p-4 md:p-6">
+              {bankTransactions.length > 0 ? (
+                <div className="border border-gray-200 rounded overflow-hidden">
+                  <table className="w-full text-left text-[13px] md:text-[14px]">
+                    <thead className="bg-[#F8F9FA] border-b border-gray-200">
+                      <tr>
+                        <th className="py-3 px-4 font-normal text-[#9EA1A6] text-[12px] uppercase tracking-wider">Date</th>
+                        <th className="py-3 px-4 font-normal text-[#9EA1A6] text-[12px] uppercase tracking-wider">Particulars</th>
+                        <th className="py-3 px-4 text-right font-normal text-[#9EA1A6] text-[12px] uppercase tracking-wider">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {bankTransactions.map((tx) => (
+                        <tr key={tx.id} className="hover:bg-gray-50">
+                          <td className="py-3 px-4 text-[12px] text-[#9EA1A6] whitespace-nowrap align-top">
+                            {new Date(tx.date).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="py-3 px-4 align-top">
+                            <p className="text-[13px] md:text-[14px] font-medium text-[#444444]">{tx.title}</p>
+                            <p className="text-[12px] text-[#9EA1A6] mt-0.5">{tx.description}</p>
+                          </td>
+                          <td className={`py-3 px-4 text-right font-mono text-[13px] md:text-[14px] align-top ${tx.type === "CREDIT" ? "text-green-600" : "text-[#444444]"}`}>
+                            {tx.type === "CREDIT" ? "+" : "-"}
+                            {formatINR(tx.amount)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
-                <div className="space-y-6 w-full">
-                  <div className="text-center md:text-left">
-    <div className="flex items-center justify-center md:justify-start gap-1.5 mb-1">
-      <p className="text-xl md:text-2xl font-medium text-gray-800 tracking-tight">{profile.name}</p>
-      <BadgeCheck className="w-5 h-5 text-blue-500" />
-    </div>
-    <h3 className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-400">Admin Name</h3>
-  </div>
-                  <div>
-                    <h3 className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5 md:mb-2">Office / Home Address</h3>
-                    {profile.address ? (
-                      <p className="text-sm md:text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{profile.address}</p>
-                    ) : (
-                      <p className="text-sm text-kite-text-light italic">No address provided.</p>
-                    )}
-                  </div>
-                  
-                  {profile.bankName && (
-                    <div className="pt-5 md:pt-6 border-t border-gray-100">
-<h3 className="text-[13px] md:text-sm font-medium text-gray-800 tracking-tight mb-3 md:mb-4 flex items-center"><BadgeCheck className="w-4 h-4 mr-1 text-kite-blue" /> Bank Account</h3>
-                      <div className="grid grid-cols-2 gap-y-4 gap-x-8 bg-gray-50 rounded-sm p-4 border border-gray-100">
-                        <div>
-                          <p className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 md:mb-1">Bank Name</p>
-                          <p className="text-[13px] md:text-sm font-medium text-gray-800">{profile.bankName}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 md:mb-1">Account Number</p>
-                          <p className="text-[13px] md:text-sm font-mono text-gray-800">{profile.accountNumber || '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 md:mb-1">IFSC Code</p>
-                          <p className="text-[13px] md:text-sm font-mono text-gray-800">{profile.ifscCode || '-'}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5 md:mb-1">Branch</p>
-                          <p className="text-[13px] md:text-sm font-medium text-gray-800">{profile.branch || '-'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div className="py-12 text-center text-[#9EA1A6] text-[13px] md:text-[14px] border border-gray-100 rounded bg-[#F8F9FA]">
+                  No transactions recorded yet.
                 </div>
               )}
             </div>
           </div>
-        </div>
-        
-        {/* Admin Unified Statement */}
-        {!isEditing && (
-          <div className="bg-white md:rounded-sm border-y md:border border-gray-200 md:border-kite-border px-4 py-6 md:p-6 md:shadow-sm mt-2 md:mt-0">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-kite-text tracking-tight">Financial Statement</h3>
-              <div className="text-right">
-                <p className="text-xs text-kite-text-light mb-1">Available balance</p>
-                <p className={"text-2xl font-medium tracking-tight " + (unifiedBalance >= 0 ? "text-kite-blue" : "text-kite-red")} style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
-                  {unifiedBalance >= 0 ? '' : '-'}{formatINR(Math.abs(unifiedBalance))}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-sm font-medium text-kite-text">Transactions</h4>
-              <select 
-                className="border border-kite-border rounded-sm px-2 py-1 text-sm bg-white outline-none"
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const rows = document.querySelectorAll('.admin-tx-row');
-                  rows.forEach(row => {
-                    if (val === 'all') row.classList.remove('hidden');
-                    else if (row.getAttribute('data-category') === val) row.classList.remove('hidden');
-                    else row.classList.add('hidden');
-                  });
-                }}
-              >
-                <option value="all">All Transactions</option>
-                <option value="commission">Commission</option>
-                <option value="sahay">Sahay</option>
-                <option value="cover">Loss Cover</option>
-              </select>
-            </div>
-            
-            {bankTransactions.length > 0 ? (
-              <div className="overflow-x-auto border border-kite-border/50 rounded-sm">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-kite-bg">
-                    <tr className="text-[10px] uppercase tracking-wider text-kite-text-light border-b border-kite-border/50">
-                      <th className="py-2.5 px-4 font-normal">Date</th>
-                      <th className="py-2.5 px-4 font-normal">Particulars</th>
-                      <th className="py-2.5 px-4 text-right font-normal">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-kite-border/50 bg-white">
-                    {bankTransactions.map(tx => (
-                      <tr key={tx.id} className="hover:bg-kite-bg/30 transition-colors admin-tx-row" data-category={tx.category || 'other'}>
-                        <td className="py-3 px-4 text-xs text-kite-text-light">{new Date(tx.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                        <td className="py-3 px-4">
-                          <p className="text-sm text-kite-text flex items-center space-x-2">
-                            <span>{tx.title}</span>
-                            {tx.category === 'commission' && <span className="px-1.5 py-0.5 rounded-sm bg-blue-100 text-blue-700 text-[9px] uppercase tracking-wider">Commission</span>}
-                            {tx.category === 'sahay' && <span className="px-1.5 py-0.5 rounded-sm bg-purple-100 text-purple-700 text-[9px] uppercase tracking-wider">Sahay</span>}
-                            {tx.category === 'cover' && <span className="px-1.5 py-0.5 rounded-sm bg-orange-100 text-orange-700 text-[9px] uppercase tracking-wider">Cover</span>}
-                          </p>
-                          <p className="text-[11px] text-kite-text-light mt-0.5">{tx.description}</p>
-                        </td>
-                        <td className={"py-3 px-4 text-right text-sm " + (tx.type === 'CREDIT' ? 'text-kite-green' : 'text-kite-text')} style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}>
-                          {tx.type === 'CREDIT' ? '+' : '-'}{formatINR(tx.amount)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="py-8 text-center text-kite-text-light text-sm border border-kite-border/50 rounded-sm">
-                No transactions recorded yet.
-              </div>
-            )}
-          </div>
         )}
+
       </div>
 
       {/* Image Cropper Modal */}
       {imageSrc && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white rounded-md w-full max-w-2xl overflow-hidden flex flex-col h-[80vh]">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-              <h3 className="font-semibold text-lg">Crop & Adjust Profile Picture</h3>
-              <button onClick={() => setImageSrc(null)} className="p-1 hover:bg-gray-100 rounded-full text-gray-500">
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white rounded w-full max-w-xl overflow-hidden flex flex-col h-[80vh]">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="font-medium text-[15px] md:text-[16px] text-[#444444]">
+                Crop Photo
+              </h3>
+              <button
+                onClick={() => setImageSrc(null)}
+                className="p-1 hover:bg-gray-100 rounded-full text-gray-500"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
             <div className="flex-1 relative bg-gray-900">
               <Cropper
                 image={imageSrc}
@@ -421,17 +503,17 @@ export default function AdminPage() {
                 onZoomChange={setZoom}
               />
             </div>
-            
-            <div className="p-6 bg-white border-t border-gray-100">
+            <div className="p-5 md:p-6 bg-white border-t border-gray-100">
               <div className="mb-6 flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-500">Zoom</span>
+                <span className="text-[13px] md:text-[14px] font-medium text-gray-500">
+                  Zoom
+                </span>
                 <input
                   type="range"
                   value={zoom}
                   min={1}
                   max={3}
                   step={0.1}
-                  aria-labelledby="Zoom"
                   onChange={(e) => setZoom(Number(e.target.value))}
                   className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
@@ -439,13 +521,13 @@ export default function AdminPage() {
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setImageSrc(null)}
-                  className="px-5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 border border-gray-200 rounded-sm"
+                  className="px-5 py-2 text-[13px] md:text-[14px] font-normal text-gray-600 hover:bg-gray-50 border border-gray-200 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createCroppedImage}
-                  className="px-5 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-sm shadow-sm"
+                  className="px-5 py-2 text-[13px] md:text-[14px] font-normal text-white bg-[#1976D2] hover:bg-blue-600 rounded shadow-sm"
                 >
                   Save Photo
                 </button>

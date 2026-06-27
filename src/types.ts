@@ -1,4 +1,7 @@
-export type AuthorityType = 'Government Authorities' | 'Trust Authorities' | 'Business Authorities';
+export type AuthorityType =
+  |"Government Authorities"
+  |"Trust Authorities"
+  |"Business Authorities";
 
 export interface Business {
   id: string;
@@ -23,7 +26,7 @@ export interface Business {
   registrationFee?: number;
   registrationCommissionPaid: number;
   taxPaid: number;
-  status: 'pending' | 'listed' | 'funded';
+  status:"pending" |"listed" |"funded";
 }
 
 export interface Investor {
@@ -53,7 +56,7 @@ export interface Investment {
   endDate: string;
   adminCommissionInvestor: number; // commission from investor
   adminCommissionBusiness: number; // commission from business upon funding
-  status: 'active' | 'completed' | 'defaulted';
+  status:"active" |"completed" |"defaulted";
   payoutDetails?: {
     rmasCommission: number;
     happyIncomeTax: number;
@@ -65,10 +68,18 @@ export interface Investment {
   };
 }
 
-export type View = 'dashboard' | 'data-analysis' | 'businesses' | 'investors' | 'investments' | 'banking' | 'pnl' | 'admin';
+export type View =
+  |"dashboard"
+  |"data-analysis"
+  |"businesses"
+  |"investors"
+  |"investments"
+  |"banking"
+  |"pnl"
+  |"admin";
 
 export interface CommissionSetting {
-  type: 'percentage' | 'amount';
+  type:"percentage" |"amount";
   value: number;
 }
 

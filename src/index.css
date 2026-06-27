@@ -1,15 +1,16 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: "Inter", sans-serif;
   
   /* Zerodha Kite Color Palette */
-  --color-kite-blue: #4184f3;
-  --color-kite-blue-dark: #3367d6;
-  --color-kite-green: #4caf50;
-  --color-kite-red: #e53935;
+  --color-kite-blue: #387ED1;
+  --color-kite-blue-dark: #2F6FC2;
+  --color-kite-green: #16a34a;
+  --color-kite-red: #df514c;
   
   --color-kite-text: var(--text-color);
   --color-kite-text-light: var(--text-light-color);
@@ -29,29 +30,44 @@
 }
 
 :root {
-  --text-color: #333333;
-  --text-light-color: #737373;
-  --border-color-soft: #f4f4f4;
-  --border-color: #eeeeee;
-  --border-color-hard: #e0e0e0;
-  --bg-color-alt: #f9f9f9;
-  --surface-color: #ffffff;
-  --body-bg: #ffffff;
+  --text-color: #1F2937;
+  --text-light-color: #6B7280;
+  --text-muted-color: #9CA3AF;
+  
+  --body-bg: #F7F8FA;
+  --surface-color: #FFFFFF;
+  --bg-color-alt: #F2F3F5;
+  --bg-hover: #EEF4FF;
+  --bg-selected: #E8F2FF;
+  --bg-focus: #D8E9FF;
+  
+  --border-color: #E5E7EB;
+  --border-color-soft: #ECECEC;
+  --border-color-hard: #E5E7EB;
+  
   --black-color: #111111;
-  --white-color: #ffffff;
+  --white-color: #FFFFFF;
 }
 
 :root.dark {
-  --text-color: #dfdfdf;
-  --text-light-color: #9b9b9b;
-  --border-color-soft: #2b2b2b;
-  --border-color: #374151;
-  --border-color-hard: #444444;
-  --bg-color-alt: #1a1a1a;
-  --surface-color: #1e1e1e;
-  --body-bg: #121212;
-  --black-color: #ffffff; 
-  --white-color: #1e1e1e;
+  --color-kite-blue: #4F8EF7;
+  
+  --text-color: #F5F5F5;
+  --text-light-color: #B7BDC6;
+  --text-muted-color: #8D939C;
+  
+  --body-bg: #0F1115;
+  --surface-color: #181B21;
+  --bg-color-alt: #20242C;
+  --bg-hover: #252A33;
+  --bg-selected: #283547;
+  
+  --border-color: #2B3038;
+  --border-color-soft: #2F343D;
+  --border-color-hard: #2B3038;
+  
+  --black-color: #FFFFFF; 
+  --white-color: #181B21;
 }
 
 /* Maintain true white color for colored elements in dark mode */
@@ -90,12 +106,7 @@
   opacity: 0.7 !important;
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--body-bg);
-  color: var(--text-color);
-  -webkit-font-smoothing: antialiased;
-}
+body { font-family: var(--font-sans); font-weight: 400; background-color: var(--body-bg); color: var(--text-color); -webkit-font-smoothing: antialiased; }
 
 /* Kite specific utility classes for scrollbars and clean looks */
 ::-webkit-scrollbar {
@@ -111,4 +122,18 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-light-color); 
+}
+
+/* આ કોડ ફક્ત 768px થી નાની સ્ક્રીન (મોબાઈલ) માટે જ કામ કરશે */
+@media (max-width: 768px) {
+  .footer-nav {
+    /* નીચેની પટ્ટી માટે જરૂરી જગ્યા */
+    padding-bottom: env(safe-area-inset-bottom);
+    /* ફૂટરની કુલ ઊંચાઈમાં iOS ની સુરક્ષિત જગ્યા ઉમેરો */
+    height: calc(60px + env(safe-area-inset-bottom));
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
