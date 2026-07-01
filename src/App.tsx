@@ -206,7 +206,10 @@ function MainLayout() {
         <TopNav currentView={currentView} onNavigate={handleNavigate} />
 
         {/* Mobile Header - Kite Style */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-kite-bg border-b border-kite-border-soft shrink-0 z-40 sticky top-0">
+        <div 
+          className="md:hidden flex items-center justify-between px-4 pb-3 bg-white dark:bg-kite-bg border-b border-kite-border-soft shrink-0 z-40 sticky top-0"
+          style={{ paddingTop: "max(12px, env(safe-area-inset-top))" }}
+        >
           <div
             className="flex flex-col cursor-pointer"
             onClick={() => handleNavigate("admin")}
