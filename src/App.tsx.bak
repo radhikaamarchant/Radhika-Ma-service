@@ -201,7 +201,7 @@ function MainLayout() {
   };
 
   return (
-    <div className="h-screen bg-gray-100 dark:bg-black text-kite-text flex flex-col overflow-hidden main-content-pb md:pb-0 font-sans">
+    <div className="h-screen bg-gray-100 dark:bg-black text-kite-text flex flex-col overflow-hidden pb-14 md:pb-0 font-sans">
       <div className="w-full h-full flex flex-col bg-white dark:bg-kite-bg relative overflow-hidden">
         <TopNav currentView={currentView} onNavigate={handleNavigate} />
 
