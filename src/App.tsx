@@ -207,7 +207,7 @@ function MainLayout() {
 
         {/* Mobile Header - Kite Style */}
         <div 
-          className="md:hidden flex items-center justify-between px-4 pb-3 bg-white dark:bg-kite-bg border-b border-kite-border-soft shrink-0 z-40 sticky top-0 mobile-header-safe"
+          className="md:hidden flex items-center justify-between px-4 pb-3 bg-white dark:bg-kite-bg border-b border-kite-border-soft shrink-0 z-40 fixed top-0 left-0 right-0 mobile-header-safe"
         >
           <div
             className="flex flex-col cursor-pointer"
@@ -217,6 +217,17 @@ function MainLayout() {
           </div>
 
           <ThemeToggleButton />
+        </div>
+        
+        {/* Spacer for fixed header */}
+        <div 
+          className="md:hidden flex items-center justify-between px-4 pb-3 opacity-0 pointer-events-none shrink-0 mobile-header-safe"
+          aria-hidden="true"
+        >
+          <div className="flex flex-col">
+            <Logo />
+          </div>
+          <div className="w-5 h-5"></div>
         </div>
 
         <div className="flex-1 flex overflow-hidden relative">
