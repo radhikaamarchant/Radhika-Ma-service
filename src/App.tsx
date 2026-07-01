@@ -116,6 +116,29 @@ function MainLayout() {
     }
   }, [currentView]);
 
+  // Handle visual viewport resize to prevent keyboard pushing the page up
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        document.documentElement.style.setProperty(
+          '--app-height',
+          `${window.visualViewport.height}px`
+        );
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      handleResize(); // Initial set
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
   // One-time migration to assign authority types to the 8 specific companies and give them subsidies
   useEffect(() => {
     if (!state.loading) {
@@ -201,7 +224,10 @@ function MainLayout() {
   };
 
   return (
-    <div className="h-screen bg-gray-100 dark:bg-black text-kite-text flex flex-col overflow-hidden pb-14 md:pb-0 font-sans">
+    <div 
+      className="bg-gray-100 dark:bg-black text-kite-text flex flex-col overflow-hidden pb-14 md:pb-0 font-sans w-full"
+      style={{ height: 'var(--app-height, 100dvh)' }}
+    >
       <div className="w-full h-full flex flex-col bg-white dark:bg-kite-bg relative overflow-hidden">
         <TopNav currentView={currentView} onNavigate={handleNavigate} />
 
