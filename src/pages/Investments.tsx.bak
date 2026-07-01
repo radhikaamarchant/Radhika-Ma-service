@@ -1856,7 +1856,7 @@ export default function Investments() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
             transition={{ type:"spring", stiffness: 400, damping: 30 }}
-            className={`fixed bottom-[72px] right-0 left-0 mx-4 md:bottom-4 md:left-auto md:right-8 md:mx-0 z-[120] bg-kite-surface shadow-lg rounded-sm border-l-4 border-kite-blue p-4 max-w-sm items-start space-x-3 ${successData.type === "SELL" ? "hidden md:flex" : "flex"}`}
+            className={`fixed bottom-24 right-0 left-0 mx-4 md:bottom-4 md:left-auto md:right-8 md:mx-0 z-[120] bg-kite-surface shadow-lg rounded-sm border-l-4 border-kite-blue p-4 max-w-sm items-start space-x-3 ${successData.type === "SELL" ? "hidden md:flex" : "flex"}`}
           >
             {""}
             <div className="w-6 h-6 rounded-full bg-kite-blue flex items-center justify-center shrink-0 mt-0.5">

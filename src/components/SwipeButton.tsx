@@ -63,21 +63,15 @@ export function SwipeButton({
     if (isSuccess) return;
     const maxDrag = containerWidth - THUMB_DIAMETER - PADDING * 2;
     const threshold = maxDrag * 0.75;
-    if (info.offset.x >= threshold) {
+    if (x.get() >= threshold) {
       setIsSuccess(true);
       await controls.start({
         x: maxDrag,
         transition: { type: "spring", bounce: 0.2, duration: 0.4 },
       });
-      setTimeout(() => {
-        if (isMounted.current) onSuccess();
-        setTimeout(() => {
-          if (isMounted.current) {
-            setIsSuccess(false);
-            controls.start({ x: 0, transition: { type: "tween", ease: "easeOut", duration: 0.4 } });
-          }
-        }, 500);
-      }, 1000);
+      if (isMounted.current) {
+        onSuccess();
+      }
     } else {
       controls.start({ x: 0, transition: { type: "tween", ease: "easeOut", duration: 0.3 } });
     }
@@ -149,7 +143,7 @@ export function SwipeButton({
           {/* success text removed */}
         </motion.div>
         <motion.div
-          drag={isSuccess ? false : "x"}
+          drag="x"
           dragConstraints={{
             left: 0,
             right: containerWidth > 0 ? containerWidth - THUMB_DIAMETER - PADDING * 2 : 0,
@@ -170,6 +164,7 @@ export function SwipeButton({
             cursor: isSuccess ? "default" : "grab",
             position: "absolute",
             left: `${PADDING}px`,
+            pointerEvents: isSuccess ? "none" : "auto",
             zIndex: 10,
             boxShadow: "0px 2px 6px rgba(0,0,0,0.15)",
           }}

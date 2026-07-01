@@ -146,10 +146,10 @@ export function SwipeButton({
           animate={{ opacity: isSuccess ? 1 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          {successText}
+          {/* success text removed */}
         </motion.div>
         <motion.div
-          drag={isSuccess ? false : "x"}
+          drag="x"
           dragConstraints={{
             left: 0,
             right: containerWidth > 0 ? containerWidth - THUMB_DIAMETER - PADDING * 2 : 0,
@@ -170,13 +170,14 @@ export function SwipeButton({
             cursor: isSuccess ? "default" : "grab",
             position: "absolute",
             left: `${PADDING}px`,
+            pointerEvents: isSuccess ? "none" : "auto",
             zIndex: 10,
             boxShadow: "0px 2px 6px rgba(0,0,0,0.15)",
           }}
           whileTap={isSuccess ? {} : { cursor: "grabbing" }}
         >
           <div style={{ color: actionType === "SELL" ? "#DF514C" : "#4184F3", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {isSuccess ? <Check size={22} strokeWidth={3} color="#4CAF50" /> : <ChevronRight size={22} strokeWidth={2.5} />}
+            {isSuccess ? <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ChevronRight size={22} strokeWidth={2.5} />}
           </div>
         </motion.div>
       </div>
